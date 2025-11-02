@@ -1,0 +1,109 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Firebase
+firebase-credentials.json
+firebase-admin-sdk.json
+serviceAccountKey.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+log/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.mypy_cache/
+.hypothesis/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Jupyter
+.ipynb_checkpoints
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+
+# Alembic
+# migrations/versions/*.py  # Uncomment to ignore migrations
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Uploads
+uploads/
+media/
+
+# Documentation
+site/
+
+# Backup files
+*.bak
+*.backup
