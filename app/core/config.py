@@ -31,19 +31,17 @@ class Settings(BaseSettings):
     RELOAD: bool = True
     WORKERS: int = 4
 
-    # Database
-    DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/bloomskin_db"
-    )
+    # Database (Optional - only needed if using PostgreSQL instead of Firestore)
+    DATABASE_URL: Optional[str] = None
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 0
 
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
+    # Redis (Optional - only needed if using Redis cache)
+    REDIS_URL: Optional[str] = None
     REDIS_CACHE_TTL: int = 3600
 
     # Security
-    SECRET_KEY: str = Field(min_length=32)
+    SECRET_KEY: str = Field(min_length=32, default="change-this-in-production-please-use-a-secure-key")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7

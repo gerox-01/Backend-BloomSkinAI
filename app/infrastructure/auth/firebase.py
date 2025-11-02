@@ -30,19 +30,28 @@ def initialize_firebase() -> None:
         return
 
     try:
+        # Check if running on Cloud Run (uses Application Default Credentials)
+        if os.getenv("K_SERVICE"):
+            logger.info("Running on Cloud Run, using Application Default Credentials")
+            firebase_admin.initialize_app(
+                options={"projectId": settings.FIREBASE_PROJECT_ID}
+            )
         # Check if credentials file exists
-        if not os.path.exists(settings.FIREBASE_CREDENTIALS_PATH):
+        elif os.path.exists(settings.FIREBASE_CREDENTIALS_PATH):
+            logger.info(f"Using Firebase credentials from {settings.FIREBASE_CREDENTIALS_PATH}")
+            cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
+            firebase_admin.initialize_app(
+                cred, {"projectId": settings.FIREBASE_PROJECT_ID}
+            )
+        else:
             logger.warning(
                 f"Firebase credentials file not found at {settings.FIREBASE_CREDENTIALS_PATH}. "
-                "Firebase auth will not work."
+                "Attempting to use Application Default Credentials."
             )
-            return
-
-        # Initialize Firebase Admin SDK
-        cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
-        firebase_admin.initialize_app(
-            cred, {"projectId": settings.FIREBASE_PROJECT_ID}
-        )
+            # Try using default credentials anyway
+            firebase_admin.initialize_app(
+                options={"projectId": settings.FIREBASE_PROJECT_ID}
+            )
 
         _firebase_initialized = True
         logger.info("Firebase Admin SDK initialized successfully")
