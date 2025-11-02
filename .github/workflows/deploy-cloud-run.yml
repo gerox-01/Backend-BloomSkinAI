@@ -1,0 +1,89 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  PROJECT_ID: bloomskinai-412aa
+  SERVICE_NAME: bloomskinai-412aa
+  REGION: us-central1
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Create .env.yaml from secrets
+        run: |
+          cat > .env.yaml << 'EOF'
+          APP_NAME: "BloomSkin API"
+          APP_VERSION: "1.0.0"
+          APP_ENV: "production"
+          DEBUG: "false"
+          API_V1_PREFIX: "/api/v1"
+          HOST: "0.0.0.0"
+          PORT: "8080"
+          RELOAD: "false"
+          WORKERS: "1"
+          SECRET_KEY: "${{ secrets.SECRET_KEY }}"
+          ALGORITHM: "HS256"
+          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+          REFRESH_TOKEN_EXPIRE_DAYS: "7"
+          BACKEND_CORS_ORIGINS: '${{ secrets.BACKEND_CORS_ORIGINS }}'
+          FIREBASE_PROJECT_ID: "${{ env.PROJECT_ID }}"
+          FIREBASE_STORAGE_BUCKET: "${{ env.PROJECT_ID }}.appspot.com"
+          FIREBASE_CREDENTIALS_PATH: "/app/firebase-credentials.json"
+          RATE_LIMIT_PER_MINUTE: "60"
+          RATE_LIMIT_PER_HOUR: "1000"
+          LOG_LEVEL: "INFO"
+          LOG_FORMAT: "json"
+          HAUT_AI_API_URL: "https://saas.haut.ai"
+          HAUT_AI_USERNAME: "${{ secrets.HAUT_AI_USERNAME }}"
+          HAUT_AI_PASSWORD: "${{ secrets.HAUT_AI_PASSWORD }}"
+          EMAILS_FROM_EMAIL: "noreply@bloomskin.com"
+          EOF
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --source . \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --env-vars-file .env.yaml \
+            --memory 512Mi \
+            --cpu 1 \
+            --timeout 300 \
+            --max-instances 10 \
+            --min-instances 0 \
+            --quiet
+
+      - name: Show deployment URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          echo "🚀 Deployment successful!"
+          echo "Service URL: $SERVICE_URL"
+          echo "Health check: $SERVICE_URL/health"
+          echo "API docs: $SERVICE_URL/docs"
