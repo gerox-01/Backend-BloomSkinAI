@@ -1,0 +1,22 @@
+# Core FastAPI
+fastapi==0.115.0
+uvicorn[standard]==0.32.1
+pydantic==2.10.5
+pydantic-settings==2.7.1
+
+# Firebase (Auth, Firestore, Storage)
+firebase-admin==6.6.0
+
+# Security & Auth
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20
+email-validator==2.2.0
+
+# Utilities
+python-dotenv==1.0.1
+loguru==0.7.3
+httpx==0.28.1
+tenacity==9.0.0
+
+# Rate limiting
+slowapi==0.1.9
